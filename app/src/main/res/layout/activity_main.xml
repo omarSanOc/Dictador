@@ -112,7 +112,7 @@
         app:layout_constraintTop_toBottomOf="@+id/btnPlus2"/>
 
     <Button
-        android:id="@+id/btnResultado"
+        android:id="@+id/btnResult"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginEnd="1dp"
