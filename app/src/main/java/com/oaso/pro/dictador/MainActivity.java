@@ -1,14 +1,19 @@
 package com.oaso.pro.dictador;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.os.Build;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.Voice;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -64,19 +69,29 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         if(status == TextToSpeech.SUCCESS){
 
-            int result = tts.setLanguage(Locale.US);
+            int result = tts.setLanguage(new Locale("spa"));
 
             if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
-                Log.e("TTS", "This language is not supported");
+                //Log.e("TTS", "This language is not supported");
+                Toast.makeText(getApplicationContext(), "This language is not supported", Toast.LENGTH_SHORT).show();
             }else{
                 start.setEnabled(true);
-                speakOut();
+                //speakOut();
 
             }
         }else{
-            Log.e("TTS", "Initilization Failde!");
+            Log.e("TTS", "Initilization Failed!");
         }
+    }
 
+    @Override
+    protected void onDestroy() {
+
+        if(tts !=null){
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
     }
 
     private void onClick(){
@@ -143,11 +158,34 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         });
     }
 
-    private void speakOut(){
-        String text = "Hello World";
-        tts.speak(text,TextToSpeech.QUEUE_FLUSH,null);
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void speakOut() {
+        String text[] = {"Oso", "perro", "gato", "raton"};
+        String saludos = "Hola";
+        tts.setPitch(1.0f);
+        //tts.speak(saludos,TextToSpeech.QUEUE_FLUSH,null);
+        for (int i=0; i < text.length; i++){
+            if(i==0){
+                tts.speak(text[i],TextToSpeech.QUEUE_FLUSH,null);
+            }else{
+                tts.speak(text[i],TextToSpeech.QUEUE_ADD,null);
+            }
+            tts.playSilentUtterance(tiempo*1000,TextToSpeech.QUEUE_ADD,null);
+        }
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
