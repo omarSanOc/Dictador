@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             @SuppressLint("DefaultLocale")
             @Override
             public void onClick(View v) {
-                if(tiempo < 5){
+                if(tiempo < 8){
                     tiempo++;
                     tiempoPalabra.setText(String.format("Intervalo de tiempo por palabra: %d", tiempo));
                 }
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void speakOut() {
-        String text[] = {"Oso", "perro", "gato", "raton"};
+        String text[] = {"abaco", "ábaco", "átomo", "raton"};
         String saludos = "Hola";
         tts.setPitch(1.0f);
         //tts.speak(saludos,TextToSpeech.QUEUE_FLUSH,null);
