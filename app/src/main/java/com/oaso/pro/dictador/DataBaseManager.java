@@ -4,68 +4,83 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 public class DataBaseManager extends SQLiteOpenHelper{
 
-    String routeStore;
-    SQLiteDatabase bd;
+   String DB_PATH = null;
+   private static String DB_NAME = "palabras";
+   private SQLiteDatabase db;
+   private final Context context;
 
 
 
     public DataBaseManager(Context context) {
-        super(context, "palabras.db3", null, 1);
-        routeStore = context.getFilesDir().getParentFile().getPath() + "palabras.db3";
+        super(context, DB_NAME, null, 1);
+        this.context = context;
+        this.DB_PATH = "/data/data/" + context.getPackageName() + "/" + "databases/";
+        Log.e("Path 1", DB_PATH);
     }
 
-    public void openDataBase(Context context){
-        try{
-
-          bd = SQLiteDatabase.openDatabase(routeStore,null, SQLiteDatabase.OPEN_READONLY);
-
-        }catch (SQLException e){
-
-            copyDataBase(context);
-            bd = SQLiteDatabase.openDatabase(routeStore,null, SQLiteDatabase.OPEN_READONLY);
-
-        }
-    }
-
-    private void copyDataBase(Context context){
-
-        try{
-
-            InputStream datosEntrada = context.getAssets().open("palabras.db3");
-            OutputStream datosSalida = new FileOutputStream(routeStore);
-
-            byte[] bufferBD = new byte[1024];
-            int longitud;
-
-            while((longitud=datosEntrada.read(bufferBD))>0){
-                datosSalida.flush();
-                datosSalida.close();
-                datosEntrada.close();
+    public void createDataBase() throws IOException{
+        boolean dbExist = checkDataBase();
+        if(!dbExist){
+            this.getReadableDatabase();
+            try{
+                copyDataBase();
+            }catch (IOException e){
+                throw new Error("Error copying database");
             }
-
-        }catch (Exception e){
-
         }
+
     }
 
-    public String datosPalabra(int id){
+    private boolean checkDataBase(){
+        SQLiteDatabase checkDB = null;
+        try{
 
-        String palabra;
-        Cursor cursor;
+            String myPath = DB_PATH + DB_NAME;
+            checkDB = SQLiteDatabase.openDatabase(myPath,null,SQLiteDatabase.OPEN_READONLY);
 
-        cursor = bd.rawQuery("SELECT * FROM Datos palabras WHERE id=" + id, null);
-        cursor.moveToFirst();
-        palabra = cursor.getString(1);
-        cursor.close();
-        return palabra;
+        }catch(SQLiteException e){}
+        if(checkDB != null){
+            checkDB.close();
+        }
+        return checkDB != null ? true : false;
+    }
+
+    private void copyDataBase() throws IOException{
+        InputStream myInput = context.getAssets().open(DB_NAME);
+        String outFileName = DB_PATH + DB_NAME;
+        OutputStream myOutput = new FileOutputStream(outFileName);
+        byte[] buffer = new byte[10];
+        int length;
+        while ((length = myInput.read(buffer))>0){
+            myOutput.write(buffer,0,length);
+        }
+        myOutput.flush();
+        myOutput.close();
+        myInput.close();
+    }
+
+    public void openDataBase() throws SQLException{
+        String myPath = DB_PATH + DB_NAME;
+        db = SQLiteDatabase.openDatabase(myPath,null,SQLiteDatabase.OPEN_READONLY);
+    }
+
+    @Override
+    public synchronized void close(){
+        if(db != null){
+            db.close();
+        }
+        super.close();
     }
 
     @Override
@@ -75,6 +90,17 @@ public class DataBaseManager extends SQLiteOpenHelper{
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if(newVersion > oldVersion){
+            try{
+                copyDataBase();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
 
+    }
+
+    public Cursor query(String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy){
+        return db.query("Dictado",null,null,null,null,null,null);
     }
 }

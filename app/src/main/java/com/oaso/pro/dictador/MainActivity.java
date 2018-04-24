@@ -3,10 +3,11 @@ package com.oaso.pro.dictador;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.SQLException;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.Voice;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener{
@@ -34,12 +36,17 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private TextView palabras;
     private TextView tiempoPalabra;
 
+    Cursor c = null;
+    DataBaseManager manager;
+
+
     @SuppressLint("DefaultLocale")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        manager = new DataBaseManager(MainActivity.this);
         tts = new TextToSpeech(this,this);
 
         palabras = findViewById(R.id.palabras);
@@ -62,36 +69,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         tiempoPalabra.setText(String.format("Intervalo de tiempo por palabra: %d", tiempo));
 
         onClick();
-    }
-
-    @Override
-    public void onInit(int status) {
-
-        if(status == TextToSpeech.SUCCESS){
-
-            int result = tts.setLanguage(new Locale("spa"));
-
-            if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
-                //Log.e("TTS", "This language is not supported");
-                Toast.makeText(getApplicationContext(), "This language is not supported", Toast.LENGTH_SHORT).show();
-            }else{
-                start.setEnabled(true);
-                //speakOut();
-
-            }
-        }else{
-            Log.e("TTS", "Initilization Failed!");
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-
-        if(tts !=null){
-            tts.stop();
-            tts.shutdown();
-        }
-        super.onDestroy();
     }
 
     private void onClick(){
@@ -159,11 +136,10 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void speakOut() {
-        String text[] = {"abaco", "ábaco", "átomo", "raton"};
-        String saludos = "Hola";
+    protected void speakOut() {
+
+        /*String text[] = {"abaco", "ábaco", "átomo", "raton"};
         tts.setPitch(1.0f);
-        //tts.speak(saludos,TextToSpeech.QUEUE_FLUSH,null);
         for (int i=0; i < text.length; i++){
             if(i==0){
                 tts.speak(text[i],TextToSpeech.QUEUE_FLUSH,null);
@@ -171,9 +147,59 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 tts.speak(text[i],TextToSpeech.QUEUE_ADD,null);
             }
             tts.playSilentUtterance(tiempo*1000,TextToSpeech.QUEUE_ADD,null);
+        }*/
+
+        try{
+            manager.createDataBase();
+        }catch (IOException ioe){
+            throw new Error("Unable to create database");
+        }
+
+        try {
+            manager.openDataBase();
+        }catch (SQLException sqle){
+            throw sqle;
+        }
+        Toast.makeText(MainActivity.this, "Succesfully Imported", Toast.LENGTH_SHORT).show();
+        c = manager.query("Dictado",null, null, null, null, null, null);
+        if(c.moveToFirst() == true){
+            do{
+                Toast.makeText(MainActivity.this,
+                        "Id: " + c.getString(0) + "\n" +
+                        "Palabras: " + c.getString(1),Toast.LENGTH_SHORT).show();
+            }while(c.moveToNext());
         }
 
     }
+
+
+    @Override
+    public void onInit(int status) {
+
+        if(status == TextToSpeech.SUCCESS){
+
+            int result = tts.setLanguage(new Locale("spa"));
+
+            if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+                Toast.makeText(getApplicationContext(), "This language is not supported", Toast.LENGTH_SHORT).show();
+            }else{
+                start.setEnabled(true);
+            }
+        }else{
+            Log.e("TTS", "Initilization Failed!");
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        if(tts !=null){
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
+    }
+
 
 
 
