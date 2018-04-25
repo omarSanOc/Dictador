@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         start.setTypeface(FontManager.getTypeface(MainActivity.this, FontManager.SOLID));
 
         palabras.setText(String.format("No. de palabras: %d", contador));
-        tiempoPalabra.setText(String.format("Intervalo de tiempo por palabra: %d", tiempo));
+        tiempoPalabra.setText(String.format("Palabras por segundo: %d", tiempo));
 
         onClick();
     }
@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             public void onClick(View v) {
                 if(tiempo < 8){
                     tiempo++;
-                    tiempoPalabra.setText(String.format("Intervalo de tiempo por palabra: %d", tiempo));
+                    tiempoPalabra.setText(String.format("Palabras por segundo: %d", tiempo));
                 }
             }
         });
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             public void onClick(View v) {
                 if (tiempo > 1){
                     tiempo--;
-                    tiempoPalabra.setText(String.format("Intervalo de tiempo por palabra: %d", tiempo));
+                    tiempoPalabra.setText(String.format("Palabras por segundo: %d", tiempo));
                 }
             }
         });
@@ -138,16 +138,18 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     protected void speakOut() {
 
-        /*String text[] = {"abaco", "ábaco", "átomo", "raton"};
+        //String text[] = {"abaco", "ábaco", "átomo", "raton"};
+        String text[] = new String[300];
+        int i = 0;
         tts.setPitch(1.0f);
-        for (int i=0; i < text.length; i++){
-            if(i==0){
-                tts.speak(text[i],TextToSpeech.QUEUE_FLUSH,null);
-            }else{
-                tts.speak(text[i],TextToSpeech.QUEUE_ADD,null);
-            }
-            tts.playSilentUtterance(tiempo*1000,TextToSpeech.QUEUE_ADD,null);
-        }*/
+        //for (int i=0; i < text.length; i++){
+         //   if(i==0){
+         //       tts.speak(text[i],TextToSpeech.QUEUE_FLUSH,null);
+         //   }else{
+         //       tts.speak(text[i],TextToSpeech.QUEUE_ADD,null);
+         //   }
+         //   tts.playSilentUtterance(tiempo*1000,TextToSpeech.QUEUE_ADD,null);
+        //}
 
         try{
             manager.createDataBase();
@@ -164,12 +166,24 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         c = manager.query("Dictado",null, null, null, null, null, null);
         if(c.moveToFirst() == true){
             do{
-                Toast.makeText(MainActivity.this,
-                        "Id: " + c.getString(0) + "\n" +
-                        "Palabras: " + c.getString(1),Toast.LENGTH_SHORT).show();
+               text[i] = c.getString(1);
+               i++;
+                //Toast.makeText(MainActivity.this,
+                //        "Id: " + c.getString(0) + "\n" +
+                //        "Palabras: " + c.getString(1),Toast.LENGTH_SHORT).show();
+
             }while(c.moveToNext());
         }
-
+        for (int j=0;j < 10;j++){
+            //Toast.makeText(getApplicationContext(),text[j],Toast.LENGTH_SHORT).show();
+            if(j==0)
+            {
+                tts.speak(text[j],TextToSpeech.QUEUE_FLUSH,null);
+            }else{
+                tts.speak(text[j],TextToSpeech.QUEUE_ADD,null);
+            }
+            tts.playSilentUtterance(tiempo*1000,TextToSpeech.QUEUE_ADD,null);
+        }
     }
 
 

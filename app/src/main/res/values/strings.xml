@@ -3,4 +3,5 @@
     <string name="plus">&#xf067;</string>
     <string name="minus">&#xf068;</string>
     <string name="iniciar">&#xf11e; Iniciar </string>
+    <string name="instrucciones">Esta aplicación dicta una serie de palabras con el objetivo de memorizar dichas palabras, es necesario un papel y un lápiz para realizar el ejercicio, el objetivo de esta aplicación es mejorar la capacidad de la memoria y del subconciente, al apretar el boton siguiente ingresas a una nueva pantalla en la cual contiene dos botones verdes(+), dos botones rojos(-), un botón azul y un botón naranja, los botones verdes incrementan el numero de palabras a memorizar en incrementos de cinco en cinco, e incrementa el tiempo de palabra por x segundo, por ejemplo si se ingresa un tiempo de tres segundos por palabra quiere decir que el dictado va a decir una palabra cada tres segundos, mientras que los botones rojos hacen lo contrario decrementan el numero de palabras y el tiempo, el botón azúl inicia el dictado y el botón naranja te manda hacia otra pantalla en la cual te demuestra la lista de palabras dictadas para verificar si realizaste bien el ejercicio.</string>
 </resources>
