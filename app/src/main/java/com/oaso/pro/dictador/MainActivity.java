@@ -3,9 +3,6 @@ package com.oaso.pro.dictador;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.SQLException;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
@@ -16,12 +13,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.Locale;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener{
 
-    private int contador = 5;
+    private int contadorPalabras = 5;
     private int tiempo = 1;
 
     private TextToSpeech tts;
@@ -36,9 +33,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private TextView palabras;
     private TextView tiempoPalabra;
 
-    Cursor c = null;
-    DataBaseManager manager;
-
+    String dictado[];
+    String resultado[] = new String[contadorPalabras];
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -46,7 +42,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        manager = new DataBaseManager(MainActivity.this);
+        dictado = getIntent().getExtras().getStringArray("DICTADO");
+
         tts = new TextToSpeech(this,this);
 
         palabras = findViewById(R.id.palabras);
@@ -65,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         min2.setTypeface(FontManager.getTypeface(MainActivity.this, FontManager.SOLID));
         start.setTypeface(FontManager.getTypeface(MainActivity.this, FontManager.SOLID));
 
-        palabras.setText(String.format("No. de palabras: %d", contador));
+        palabras.setText(String.format("No. de palabras: %d", contadorPalabras));
         tiempoPalabra.setText(String.format("Palabras por segundo: %d", tiempo));
 
         onClick();
@@ -84,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ResulActivity.class);
+                intent.putExtra("RESULTADO",resultado);
+                intent.putExtra("PALABRAS",contadorPalabras);
                 startActivity(intent);
             }
         });
@@ -92,10 +91,10 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             @SuppressLint("DefaultLocale")
             @Override
             public void onClick(View v) {
-                if (contador < 50)
+                if (contadorPalabras < 30)
                 {
-                    contador += 5;
-                    palabras.setText(String.format("No. de palabras: %d", contador));
+                    contadorPalabras += 5;
+                    palabras.setText(String.format("No. de palabras: %d", contadorPalabras));
                 }
             }
         });
@@ -104,10 +103,10 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             @SuppressLint("DefaultLocale")
             @Override
             public void onClick(View v) {
-                if (contador > 5)
+                if (contadorPalabras > 5)
                 {
-                    contador -= 5;
-                    palabras.setText(String.format("No. de palabras: %d", contador));
+                    contadorPalabras -= 5;
+                    palabras.setText(String.format("No. de palabras: %d", contadorPalabras));
                 }
             }
         });
@@ -136,51 +135,19 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    protected void speakOut() {
-
-        //String text[] = {"abaco", "ábaco", "átomo", "raton"};
-        String text[] = new String[300];
-        int i = 0;
+    protected void speakOut(){
+        Random random = new Random();
         tts.setPitch(1.0f);
-        //for (int i=0; i < text.length; i++){
-         //   if(i==0){
-         //       tts.speak(text[i],TextToSpeech.QUEUE_FLUSH,null);
-         //   }else{
-         //       tts.speak(text[i],TextToSpeech.QUEUE_ADD,null);
-         //   }
-         //   tts.playSilentUtterance(tiempo*1000,TextToSpeech.QUEUE_ADD,null);
-        //}
-
-        try{
-            manager.createDataBase();
-        }catch (IOException ioe){
-            throw new Error("Unable to create database");
-        }
-
-        try {
-            manager.openDataBase();
-        }catch (SQLException sqle){
-            throw sqle;
-        }
-        Toast.makeText(MainActivity.this, "Succesfully Imported", Toast.LENGTH_SHORT).show();
-        c = manager.query("Dictado",null, null, null, null, null, null);
-        if(c.moveToFirst() == true){
-            do{
-               text[i] = c.getString(1);
-               i++;
-                //Toast.makeText(MainActivity.this,
-                //        "Id: " + c.getString(0) + "\n" +
-                //        "Palabras: " + c.getString(1),Toast.LENGTH_SHORT).show();
-
-            }while(c.moveToNext());
-        }
-        for (int j=0;j < 10;j++){
-            //Toast.makeText(getApplicationContext(),text[j],Toast.LENGTH_SHORT).show();
-            if(j==0)
-            {
-                tts.speak(text[j],TextToSpeech.QUEUE_FLUSH,null);
+        int number;
+        for (int i=0; i <  contadorPalabras; i++){
+           if(i==0){
+                number = random.nextInt(239);
+                tts.speak(dictado[number],TextToSpeech.QUEUE_FLUSH,null);
+                resultado[i] = dictado[number];
             }else{
-                tts.speak(text[j],TextToSpeech.QUEUE_ADD,null);
+                number = random.nextInt(239);
+                tts.speak(dictado[number],TextToSpeech.QUEUE_ADD,null);
+                resultado[i] = dictado[number];
             }
             tts.playSilentUtterance(tiempo*1000,TextToSpeech.QUEUE_ADD,null);
         }
@@ -205,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy(){
 
         if(tts !=null){
             tts.stop();

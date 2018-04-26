@@ -18,7 +18,7 @@ public class StartActivity extends AppCompatActivity {
     Cursor c = null;
     DataBaseManager manager;
 
-    String text[] = new String[300];
+    String text[] = new String[240];
     int i = 0;
 
     Button siguiente;
@@ -30,19 +30,13 @@ public class StartActivity extends AppCompatActivity {
 
         siguiente = findViewById(R.id.btnIniciar);
 
-
-
         siguiente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Sincronizar inicio = new Sincronizar();
                 inicio.execute();
-                Intent intent = new Intent(StartActivity.this,MainActivity.class);
-                startActivity(intent);
-                //Toast.makeText(getApplicationContext(),text[5],Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     private class Sincronizar extends AsyncTask<String,Integer,String>{
@@ -76,18 +70,10 @@ public class StartActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            Toast.makeText(StartActivity.this, "Succesfully Imported", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(StartActivity.this,MainActivity.class);
+            intent.putExtra("DICTADO",text);
+            startActivity(intent);
         }
     }
-
-
-
-
-
-
-
-
-
-
 
 }
