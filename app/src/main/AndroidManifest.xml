@@ -14,7 +14,7 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".ResulActivity"
+            android:name=".ResultActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity android:name=".StartActivity">

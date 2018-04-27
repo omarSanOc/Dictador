@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private TextView tiempoPalabra;
 
     String dictado[];
-    String resultado[] = new String[contadorPalabras];
+    String resultado[];
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         result.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ResulActivity.class);
+                Intent intent = new Intent(MainActivity.this, ResultActivity.class);
                 intent.putExtra("RESULTADO",resultado);
                 intent.putExtra("PALABRAS",contadorPalabras);
                 startActivity(intent);
@@ -139,7 +139,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         Random random = new Random();
         tts.setPitch(1.0f);
         int number;
-        for (int i=0; i <  contadorPalabras; i++){
+        resultado = new String[contadorPalabras];
+        for (int i=0; i < contadorPalabras; i++){
            if(i==0){
                 number = random.nextInt(239);
                 tts.speak(dictado[number],TextToSpeech.QUEUE_FLUSH,null);
