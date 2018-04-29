@@ -8,8 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
-
 import java.io.IOException;
 
 
@@ -18,8 +16,9 @@ public class StartActivity extends AppCompatActivity {
     Cursor c = null;
     DataBaseManager manager;
 
-    String text[] = new String[240];
+    String text[];
     int i = 0;
+    boolean dataBaseExist = true;
 
     Button siguiente;
 
@@ -33,8 +32,15 @@ public class StartActivity extends AppCompatActivity {
         siguiente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Sincronizar inicio = new Sincronizar();
-                inicio.execute();
+                if(dataBaseExist){
+                   dataBaseExist = false;
+                    Sincronizar inicio = new Sincronizar();
+                    inicio.execute();
+                }else{
+                    Intent intent = new Intent(StartActivity.this,MainActivity.class);
+                    intent.putExtra("DICTADO",text);
+                    startActivity(intent);
+                }
             }
         });
     }
@@ -56,6 +62,7 @@ public class StartActivity extends AppCompatActivity {
             } catch (SQLException sqle) {
                 throw sqle;
             }
+            text = new String[240];
             c = manager.query("Dictado", null, null, null, null, null, null);
             if (c.moveToFirst() == true) {
                 do {
@@ -75,5 +82,4 @@ public class StartActivity extends AppCompatActivity {
             startActivity(intent);
         }
     }
-
 }

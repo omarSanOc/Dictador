@@ -6,7 +6,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 public class ResultActivity extends AppCompatActivity{
 
@@ -39,9 +38,7 @@ public class ResultActivity extends AppCompatActivity{
         finish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent intent = new Intent(ResultActivity.this, MainActivity.class);
-                //startActivity(intent);
-                Toast.makeText(getApplicationContext(),resultado[2],Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }

@@ -3,7 +3,9 @@ package com.oaso.pro.dictador;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,13 +38,15 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     String dictado[];
     String resultado[];
 
+    boolean isDone = false;
+
     @SuppressLint("DefaultLocale")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        dictado = getIntent().getExtras().getStringArray("DICTADO");
+            dictado = getIntent().getExtras().getStringArray("DICTADO");
 
         tts = new TextToSpeech(this,this);
 
@@ -80,10 +84,12 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         result.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ResultActivity.class);
-                intent.putExtra("RESULTADO",resultado);
-                intent.putExtra("PALABRAS",contadorPalabras);
-                startActivity(intent);
+                if(!tts.isSpeaking() && isDone){
+                    Intent intent = new Intent(MainActivity.this, ResultActivity.class);
+                    intent.putExtra("RESULTADO",resultado);
+                    intent.putExtra("PALABRAS",contadorPalabras);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -138,9 +144,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     protected void speakOut(){
         Random random = new Random();
         tts.setPitch(1.0f);
-        int number;
+        int number, i;
         resultado = new String[contadorPalabras];
-        for (int i=0; i < contadorPalabras; i++){
+        for (i=0; i < contadorPalabras; i++){
            if(i==0){
                 number = random.nextInt(239);
                 tts.speak(dictado[number],TextToSpeech.QUEUE_FLUSH,null);
@@ -152,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
             tts.playSilentUtterance(tiempo*1000,TextToSpeech.QUEUE_ADD,null);
         }
+        isDone = true;
     }
 
 
@@ -181,19 +188,4 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
         super.onDestroy();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
