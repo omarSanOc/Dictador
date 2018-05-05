@@ -2,14 +2,14 @@ package com.oaso.pro.dictador;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     String dictado[];
     String resultado[];
-
     boolean isDone = false;
 
     @SuppressLint("DefaultLocale")
@@ -45,8 +44,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-            dictado = getIntent().getExtras().getStringArray("DICTADO");
+        dictado = getIntent().getExtras().getStringArray("DICTADO");
 
         tts = new TextToSpeech(this,this);
 
@@ -187,5 +187,12 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             tts.shutdown();
         }
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent(getApplicationContext(),StartActivity.class);
+        startActivityForResult(intent, 0);
+        return true;
     }
 }
