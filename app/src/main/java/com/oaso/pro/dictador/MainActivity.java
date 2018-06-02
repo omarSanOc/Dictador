@@ -2,7 +2,6 @@ package com.oaso.pro.dictador;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
@@ -74,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     private void onClick(){
 
+        /*Evento que inicia el dictado de la aplicación*/
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         });
 
+        /*Evento que visualiza las palabras dictadas para el usuario*/
         result.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,30 +94,33 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         });
 
+        /*Evento que incrementa el número de palabras */
         plus1.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("DefaultLocale")
             @Override
             public void onClick(View v) {
                 if (contadorPalabras < 30)
                 {
-                    contadorPalabras += 5;
+                    contadorPalabras += 1;
                     palabras.setText(String.format("No. de palabras: %d", contadorPalabras));
                 }
             }
         });
 
+        /*Evento que decrementa el número de palabras */
         min1.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("DefaultLocale")
             @Override
             public void onClick(View v) {
                 if (contadorPalabras > 5)
                 {
-                    contadorPalabras -= 5;
+                    contadorPalabras -= 1;
                     palabras.setText(String.format("No. de palabras: %d", contadorPalabras));
                 }
             }
         });
 
+        /*Evento que incrementa el tiempo de palabra por segundo */
         plus2.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("DefaultLocale")
             @Override
@@ -128,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         });
 
+        /*Evento que decrementa el tiempo de palabra por segundo */
         min2.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("DefaultLocale")
             @Override
